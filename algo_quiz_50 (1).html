@@ -1,0 +1,371 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{padding:1rem 0;font-family:var(--font-sans)}
+.hdr{margin-bottom:1.25rem}
+.hdr h2{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.hdr p{font-size:13px;color:var(--color-text-secondary)}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1.25rem}
+.tab{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.tab.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:transparent}
+.tab:hover:not(.active){background:var(--color-background-secondary)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.stat-num{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.stat-lbl{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.pbar{height:4px;background:var(--color-background-secondary);border-radius:2px;margin-bottom:1.25rem}
+.pfill{height:100%;background:var(--color-text-primary);border-radius:2px;transition:width .3s}
+.qcard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.qmeta{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.badge{font-size:11px;padding:3px 9px;border-radius:12px;font-weight:500}
+.bs{background:#E6F1FB;color:#0C447C}
+.bso{background:#EAF3DE;color:#3B6D11}
+.bdp{background:#EEEDFE;color:#3C3489}
+.bgr{background:#FAEEDA;color:#633806}
+.bbo{background:#FAECE7;color:#712B13}
+.bco{background:#FBEAF0;color:#72243E}
+.qnum{font-size:12px;color:var(--color-text-secondary)}
+.qdiff{font-size:11px;padding:3px 8px;border-radius:12px;margin-left:auto}
+.de{background:#EAF3DE;color:#3B6D11}
+.dm{background:#FAEEDA;color:#633806}
+.dh{background:#FCEBEB;color:#791F1F}
+.qtext{font-size:14px;color:var(--color-text-primary);line-height:1.6;margin-bottom:14px}
+.qcode{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;font-family:var(--font-mono);font-size:12px;color:var(--color-text-primary);margin-bottom:14px;white-space:pre;overflow-x:auto;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{padding:9px 13px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);cursor:pointer;font-size:13px;color:var(--color-text-primary);background:transparent;text-align:left;transition:all .15s;line-height:1.5}
+.opt:hover:not(.dis){background:var(--color-background-secondary);border-color:var(--color-border-primary)}
+.opt.ok{background:#EAF3DE;border-color:#639922;color:#3B6D11}
+.opt.no{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+.opt.rv{background:#EAF3DE;border-color:#639922;color:#3B6D11}
+.opt.dis{cursor:default}
+.expl{margin-top:10px;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-secondary);line-height:1.6;border-left:3px solid var(--color-border-secondary)}
+.expl strong{color:var(--color-text-primary);font-weight:500}
+.acts{display:flex;gap:8px;margin-top:10px}
+.btn{padding:7px 14px;border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);transition:all .15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-p{background:var(--color-text-primary);color:var(--color-background-primary);border-color:transparent}
+.btn-p:hover{opacity:.85}
+</style>
+
+<div class="app">
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">แบบฝึกหัด Algorithm 50 ข้อ ครอบคลุม Searching Sorting DP Graph Big-O</h2>
+<div class="hdr">
+  <h2>Algorithm & DS — 50 ข้อสอบ</h2>
+  <p>จากข้อสอบจริง: LeetCode, ICPC, FAANG Interviews, CS Theory</p>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="sT">0</div><div class="stat-lbl">ทั้งหมด</div></div>
+  <div class="stat"><div class="stat-num" id="sC" style="color:#639922">0</div><div class="stat-lbl">ถูก</div></div>
+  <div class="stat"><div class="stat-num" id="sW" style="color:#E24B4A">0</div><div class="stat-lbl">ผิด</div></div>
+  <div class="stat"><div class="stat-num" id="sP">—</div><div class="stat-lbl">คะแนน</div></div>
+</div>
+<div class="pbar"><div class="pfill" id="pf" style="width:0%"></div></div>
+<div id="qa"></div>
+</div>
+
+<script>
+const TOPICS=[
+  {id:'all',label:'ทั้งหมด (50)'},
+  {id:'search',label:'Searching'},
+  {id:'sort',label:'Sorting'},
+  {id:'dp',label:'Greedy/DP'},
+  {id:'coin',label:'Coin/Knapsack'},
+  {id:'bigo',label:'Big-O / T(n)'},
+  {id:'graph',label:'Graph+BFS/DFS'},
+];
+const Q=[
+  {id:1,t:'search',d:'easy',src:'Binary Search Classic',
+   q:'Binary Search ต้องการเงื่อนไขอะไรจึงใช้ได้?',
+   opts:['A) Array ต้องเป็น unsorted','B) Array ต้องเป็น sorted','C) Array ต้องมีจำนวน element คู่','D) Array ต้องมี no duplicates'],
+   a:1,e:'Binary Search ทำงานบน sorted array เท่านั้น โดยแบ่งครึ่ง search space ทุก step ถ้า array ไม่ sorted ผลลัพธ์ผิดพลาดได้'},
+  {id:2,t:'search',d:'easy',src:'LeetCode #704',
+   q:'Binary Search บน array 1,000,000 elements ใช้กี่ comparisons ใน worst case?',
+   opts:['A) 1,000,000','B) 500,000','C) 20','D) 100'],
+   a:2,e:'log₂(1,000,000) ≈ 19.93 ≈ 20 ครั้ง เทียบ Linear Search ที่ต้อง 1,000,000 ครั้ง'},
+  {id:3,t:'search',d:'medium',src:'LeetCode #33 — Rotated Sorted Array',
+   q:'arr=[4,5,6,7,0,1,2], target=0, mid=3, arr[mid]=7 ขั้นตอนถัดไปใน modified binary search?',
+   code:'arr=[4,5,6,7,0,1,2], left=0,right=6,mid=3\narr[mid]=7, target=0',
+   opts:['A) right=mid-1 เพราะ arr[mid]>target','B) left half [4..7] sorted แต่ 0 ไม่อยู่ใน range → left=mid+1','C) right half [0..2] sorted → right=mid-1','D) B และ C ให้ผลเหมือนกัน'],
+   a:1,e:'ตรวจ left half [4,5,6,7] sorted แต่ target=0 ไม่อยู่ใน [4,7] → ค้นหา right half: left=mid+1'},
+  {id:4,t:'search',d:'medium',src:'Binary Search — First Occurrence',
+   q:'หา first occurrence ของ 2 ใน [1,2,2,2,3,4] ควรแก้ Binary Search อย่างไร?',
+   opts:['A) ใช้ Binary Search ปกติ หา index ใดก็ได้','B) เมื่อ arr[mid]==target ให้ right=mid แล้ว track answer','C) ใช้ Linear Search เพราะ Binary Search ไม่รองรับ duplicates','D) ใช้ Two Pointer'],
+   a:1,e:'เมื่อพบ target ให้ record index แล้ว continue ค้นหาทาง left: right=mid (ไม่ใช่ mid-1) เพื่อหา leftmost'},
+  {id:5,t:'search',d:'hard',src:'LeetCode #4 — Median of Two Sorted Arrays',
+   q:'หา median ของ [1,3] และ [2] ใน O(log(m+n)) ควรใช้วิธีใด?',
+   opts:['A) Merge แล้วหา median — O(m+n)','B) Binary Search บน partition ของ array เล็ก — O(log(min(m,n)))','C) Linear Search บน array รวม','D) ใช้ Quick Select — O(n) average'],
+   a:1,e:'Binary Search partition: แบ่ง array ทั้งสองด้วย partition point ที่ถูกต้อง ตรวจว่า left side ทั้งหมด ≤ right side รันใน O(log(min(m,n)))'},
+  {id:6,t:'search',d:'medium',src:'Interpolation Search',
+   q:'Interpolation Search เหมาะกับ data แบบใด และ best case complexity คือ?',
+   opts:['A) Random data, O(log n)','B) Uniformly distributed data, O(log log n)','C) Sorted data, O(1)','D) Any data, O(n)'],
+   a:1,e:'Interpolation Search ใช้ formula pos = lo + ((target-arr[lo])/(arr[hi]-arr[lo]))*(hi-lo) เมื่อ data กระจายสม่ำเสมอ มี avg O(log log n) แต่ worst case O(n)'},
+  {id:7,t:'search',d:'hard',src:'LeetCode #74 — Search 2D Matrix',
+   q:'Matrix ขนาด m×n ที่แต่ละแถวเรียงลำดับ และแถวแรกของแถวถัดไป > แถวสุดท้ายของแถวก่อน จะ search ใน O(log(m×n)) ได้อย่างไร?',
+   opts:['A) Binary Search ทีละแถว O(m log n)','B) Binary Search บน matrix โดย map index: mid → (mid//n, mid%n)','C) DFS จาก top-left','D) Two Pointer จาก top-right'],
+   a:1,e:'Treat matrix เป็น 1D array: index i → row=i//n, col=i%n ทำ Binary Search บน virtual 1D array ขนาด m×n รันใน O(log(m×n))'},
+  {id:8,t:'search',d:'medium',src:'Ternary Search',
+   q:'Ternary Search เหมาะกับการแก้ปัญหาประเภทใดมากที่สุด?',
+   opts:['A) Searching ใน sorted array','B) หา maximum/minimum ของ unimodal function','C) String matching','D) Graph traversal'],
+   a:1,e:'Ternary Search ใช้หา max/min ของ unimodal function (เพิ่มแล้วลด หรือลดแล้วเพิ่ม) แบ่ง search space เป็น 3 ส่วน complexity O(log₃ n)'},
+
+  {id:9,t:'sort',d:'easy',src:'Sorting Comparison',
+   q:'Sorting algorithm ใดมี worst-case O(n log n) เสมอ (ไม่ใช่แค่ average)?',
+   opts:['A) Quick Sort','B) Merge Sort และ Heap Sort','C) Insertion Sort','D) Bubble Sort'],
+   a:1,e:'Merge Sort: แบ่งครึ่งเสมอ T(n)=2T(n/2)+O(n) → O(n log n) ทุก case Heap Sort: build heap O(n) + n extractions O(log n) each → O(n log n) เสมอ'},
+  {id:10,t:'sort',d:'medium',src:'Sorting Stability',
+   q:'Stable sorting algorithms คืออะไร และตัวอย่างที่ stable?',
+   opts:['A) Sort ที่ทำงาน in-place เช่น Heap Sort','B) Sort ที่รักษาลำดับสัมพัทธ์ของ equal elements เช่น Merge Sort, Insertion Sort','C) Sort ที่มี O(n log n) worst case','D) Sort ที่ไม่ใช้ extra memory'],
+   a:1,e:'Stable sort รักษาลำดับ: ถ้า a[i]==a[j] และ i<j ก่อน sort แล้ว a[i] จะอยู่ก่อน a[j] หลัง sort ด้วย Merge Sort, Insertion Sort, Bubble Sort stable; Quick Sort, Heap Sort ไม่ stable'},
+  {id:11,t:'sort',d:'medium',src:'LeetCode #912',
+   q:'Quick Sort worst case เกิดขึ้นเมื่อใด?',
+   opts:['A) Array มี random data','B) Array sorted แล้วและเลือก first/last element เป็น pivot','C) Array มี all equal elements (ใช้ 3-way partition แล้ว)','D) Array มีขนาดคู่'],
+   a:1,e:'Worst case O(n²) เมื่อ pivot แย่มาก เช่น sorted array + pick first/last เป็น pivot แต่ละ partition ได้ขนาด (0, n-1) แก้ด้วย random pivot หรือ median-of-three'},
+  {id:12,t:'sort',d:'easy',src:'Counting Sort',
+   q:'Counting Sort เหมาะกับ input แบบใดและมี complexity อะไร?',
+   opts:['A) Real numbers ทุก range, O(n log n)','B) Integers ใน range [0,k] เมื่อ k=O(n), มี O(n+k)','C) Strings, O(n²)','D) Floating point, O(n)'],
+   a:1,e:'Counting Sort ทำงานกับ integers ใน range จำกัด: สร้าง count array ขนาด k+1 แล้ว prefix sum มี O(n+k) เมื่อ k เล็ก ทำ better กว่า comparison sorts'},
+  {id:13,t:'sort',d:'hard',src:'Radix Sort',
+   q:'Radix Sort LSD (Least Significant Digit) มี time complexity อะไรสำหรับ n integers ที่มี d digits?',
+   opts:['A) O(n log n)','B) O(d(n+b)) โดย b = base (เช่น 10)','C) O(n²)','D) O(nd)'],
+   a:1,e:'Radix Sort ทำ d passes ของ Counting Sort แต่ละ pass O(n+b) รวม O(d(n+b)) เมื่อ d=O(1) และ b=O(n) จะได้ O(n) beats comparison sorts!'},
+  {id:14,t:'sort',d:'medium',src:'Tim Sort',
+   q:'Tim Sort (ใช้ใน Python, Java) คือ combination ของ algorithm ใด?',
+   opts:['A) Merge Sort + Bubble Sort','B) Merge Sort + Insertion Sort','C) Quick Sort + Merge Sort','D) Heap Sort + Insertion Sort'],
+   a:1,e:'Tim Sort แบ่ง array เป็น "runs" เล็กๆ ใช้ Insertion Sort (เร็วสำหรับ small arrays) แล้ว Merge runs เข้าด้วยกัน ทำให้ best case O(n) สำหรับ nearly sorted data'},
+  {id:15,t:'sort',d:'hard',src:'Lower Bound Proof',
+   q:'ทำไม comparison-based sorting มี lower bound Ω(n log n)?',
+   opts:['A) เพราะ memory จำกัด','B) Decision tree มี n! leaves → height ≥ log₂(n!) ≈ n log n','C) เพราะต้อง compare ทุกคู่','D) เป็นกฎของ computer science ที่พิสูจน์ไม่ได้'],
+   a:1,e:'Decision tree: แต่ละ comparison แบ่ง 2 branches มี n! permutations ที่เป็นไปได้ → tree ต้องมี ≥ n! leaves → height ≥ log₂(n!) ≈ n log n โดย Stirling\'s approximation'},
+  {id:16,t:'sort',d:'medium',src:'Dutch National Flag',
+   q:'LeetCode #75 Sort Colors: sort [2,0,2,1,1,0] ใน one-pass O(n) O(1) space ใช้ algorithm ใด?',
+   code:'Input: [2,0,2,1,1,0]\nOutput: [0,0,1,1,2,2]',
+   opts:['A) Counting Sort','B) Dutch National Flag (3-way partition พร้อม 3 pointers)','C) Quick Sort','D) Insertion Sort'],
+   a:1,e:'Dutch National Flag: 3 pointers low=0, mid=0, high=n-1 เมื่อ arr[mid]=0 swap(low,mid) low++,mid++ เมื่อ arr[mid]=2 swap(mid,high) high-- เมื่อ arr[mid]=1 mid++ O(n) one-pass'},
+
+  {id:17,t:'dp',d:'easy',src:'Fibonacci DP',
+   q:'Fibonacci brute force vs memoization: fib(n) มี complexity อะไรตามลำดับ?',
+   opts:['A) O(n) และ O(n)','B) O(2ⁿ) และ O(n)','C) O(n²) และ O(n)','D) O(2ⁿ) และ O(log n)'],
+   a:1,e:'Brute: tree มี ~2ⁿ nodes แต่ละ node O(1) → O(2ⁿ) Memo: แต่ละ subproblem คำนวณครั้งเดียว n subproblems → O(n)'},
+  {id:18,t:'dp',d:'medium',src:'Activity Selection — Greedy',
+   q:'Activity Selection Problem: Greedy ที่ optimal คือ?',
+   opts:['A) เลือก activity ที่ start_time น้อยสุด','B) เลือก activity ที่ duration สั้นสุด','C) เลือก activity ที่ end_time น้อยสุด (Earliest Finish)','D) เลือก activity ที่ start_time มากสุด'],
+   a:2,e:'EFT Greedy: เลือก activity ที่จบก่อน ทำให้เหลือเวลามากสุดสำหรับ activities ถัดไป พิสูจน์โดย exchange argument ว่า EFT ≥ optimal solution อื่นทุกตัว'},
+  {id:19,t:'dp',d:'hard',src:'LeetCode #1143 — LCS',
+   q:'LCS("ABCBDAB","BDCAB") มีความยาวเท่าไหร่?',
+   opts:['A) 3','B) 4','C) 5','D) 6'],
+   a:1,e:'LCS = "BCAB" หรือ "BDAB" ยาว 4 DP: dp[i][j] = LCS ของ X[0..i-1] กับ Y[0..j-1] ถ้า X[i]==Y[j] → dp[i][j]=dp[i-1][j-1]+1'},
+  {id:20,t:'dp',d:'medium',src:'DP vs Greedy',
+   q:'ปัญหาใดต่อไปนี้ Greedy ให้ผล optimal แน่นอน?',
+   opts:['A) 0/1 Knapsack','B) Fractional Knapsack','C) Matrix Chain Multiplication','D) Edit Distance'],
+   a:1,e:'Fractional Knapsack: เลือก item ที่ value/weight สูงสุดก่อน เอาบางส่วนได้ → Greedy optimal 0/1 Knapsack ต้องเลือกทั้งชิ้น → ต้องใช้ DP'},
+  {id:21,t:'dp',d:'hard',src:'LeetCode #72 — Edit Distance',
+   q:'Edit Distance (Levenshtein) ของ "horse" และ "ros" คือ? (insert/delete/replace แต่ละอย่างมี cost 1)',
+   opts:['A) 2','B) 3','C) 4','D) 5'],
+   a:1,e:'horse → rorse (replace h→r) → rose (remove r) → ros (remove e) = 3 operations DP: dp[i][j] = min edit distance ของ word1[0..i] และ word2[0..j]'},
+  {id:22,t:'dp',d:'medium',src:'LeetCode #300 — LIS',
+   q:'Longest Increasing Subsequence (LIS) ของ [10,9,2,5,3,7,101,18] มีความยาวเท่าไหร่?',
+   code:'arr = [10, 9, 2, 5, 3, 7, 101, 18]',
+   opts:['A) 3','B) 4','C) 5','D) 6'],
+   a:1,e:'LIS = [2,3,7,101] หรือ [2,5,7,101] ยาว 4 DP naive O(n²): dp[i]=max LIS ending at i DP+binary search O(n log n): maintain patience sorted array'},
+  {id:23,t:'dp',d:'hard',src:'LeetCode #312 — Burst Balloons',
+   q:'Burst Balloons: เหตุใดต้องใช้ Interval DP แทน Linear DP?',
+   opts:['A) เพราะ array มีขนาดใหญ่','B) เพราะการ burst balloon ทำให้ neighbors เปลี่ยน — ต้อง define subproblem เป็น interval ที่ยัง intact','C) เพราะ Greedy ไม่ work','D) เพราะต้องการ O(1) space'],
+   a:1,e:'Key insight: แทนที่จะคิดว่า "burst อันไหนก่อน" ให้คิดว่า "อันไหนถูก burst เป็น last ใน interval (i,j)" → dp[i][j] = max coins จาก last burst ใน (i,j)'},
+  {id:24,t:'dp',d:'medium',src:'Matrix Chain Multiplication',
+   q:'Matrix Chain: A(10×30) × B(30×5) × C(5×60) optimal parenthesization คือ?',
+   opts:['A) (A×B)×C: cost=10×30×5+10×5×60=1500+3000=4500','B) A×(B×C): cost=30×5×60+10×30×60=9000+18000=27000','C) ทั้งสองให้ cost เท่ากัน','D) ต้องใช้ Greedy'],
+   a:0,e:'(A×B)×C ดีกว่า: (A×B)=10×30×5=1500 operations แล้ว result(10×5)×C=10×5×60=3000 รวม 4500 A×(B×C): (B×C)=30×5×60=9000 แล้ว A×result=10×30×60=18000 รวม 27000'},
+
+  {id:25,t:'coin',d:'easy',src:'Coin Change — Greedy fails',
+   q:'coins=[1,5,6,9], amount=11 Greedy (เลือกใหญ่สุดก่อน) vs DP ให้ผลต่างกันอย่างไร?',
+   opts:['A) Greedy ดีกว่า: 9+1+1=3 coins','B) DP ดีกว่า: 5+6=2 coins','C) ทั้งสองให้ 2 coins เหมือนกัน','D) ต้องการ 4 coins'],
+   a:1,e:'Greedy: 9+1+1=3 coins DP พบ 5+6=11 ใช้แค่ 2 coins ตัวอย่างนี้แสดงว่า Greedy ไม่ optimal สำหรับ Coin Change ทั่วไป'},
+  {id:26,t:'coin',d:'medium',src:'LeetCode #322 — Coin Change DP',
+   q:'DP Coin Change: dp[i]=min coins ที่ทำได้ amount i โค้ดด้านล่างมีบั๊กตรงไหน?',
+   code:'for i in range(1, amount+1):\n  for coin in coins:\n    if coin<=i:\n      dp[i]=min(dp[i], dp[i-coin])  # ผิดตรงไหน?',
+   opts:['A) ควรเป็น dp[i-coin]+1','B) loop ควรเริ่มจาก 0','C) ควรเป็น dp[i]=dp[i-coin]+coin','D) ไม่มีบั๊ก'],
+   a:0,e:'ลืม +1! dp[i-coin] คือ coins สำหรับ amount ที่เหลือ แต่ต้อง +1 สำหรับ coin ที่เพิ่ม: dp[i]=min(dp[i], dp[i-coin]+1)'},
+  {id:27,t:'coin',d:'medium',src:'0/1 Knapsack',
+   q:'0/1 Knapsack: W=5, items=[(w=2,v=3),(w=3,v=4),(w=4,v=5)] max value คือ?',
+   code:'Capacity W=5\nitem1: w=2,v=3\nitem2: w=3,v=4\nitem3: w=4,v=5',
+   opts:['A) 5 (item3)','B) 7 (item1+item2, w=2+3=5)','C) 8 (item2+item3, w=7>W ไม่ได้)','D) 4 (item2)'],
+   a:1,e:'item1+item2: weight=5≤W, value=7 item3 alone: value=5 item1+item3: weight=6>W ไม่ได้ ดังนั้น max=7'},
+  {id:28,t:'coin',d:'hard',src:'Unbounded vs 0/1 Knapsack',
+   q:'ความแตกต่างหลักของ 0/1 Knapsack กับ Unbounded Knapsack ในส่วนของ DP transition?',
+   opts:['A) 0/1: dp[i][w]=dp[i-1][w-wt]+val, Unbounded: dp[w]=dp[w-wt]+val (ใช้ item ซ้ำได้)','B) ไม่มีความแตกต่าง','C) 0/1 ใช้ Greedy, Unbounded ใช้ DP','D) Unbounded มี complexity O(n²) กว่า'],
+   a:0,e:'0/1: iterate items outer loop, capacity inner ← หรือ → ก็ได้โดย backward Unbounded: ไม่มี dimension สำหรับ items เดิน forward บน capacity: dp[w]=max(dp[w], dp[w-wt]+val)'},
+  {id:29,t:'coin',d:'medium',src:'LeetCode #518 — Coin Change 2',
+   q:'Coin Change 2 (จำนวน combinations ที่รวมได้ amount): แตกต่างจาก Coin Change 1 อย่างไร?',
+   opts:['A) ใช้ Greedy แทน DP','B) dp[i] += dp[i-coin] (นับจำนวน ways) แทน min (นับ coins น้อยสุด)','C) ต้องใช้ recursion','D) Coin Change 2 ยากกว่า ต้องใช้ O(n²)'],
+   a:1,e:'Coin Change 1: dp[i]=min(dp[i], dp[i-coin]+1) Coin Change 2: dp[i]+=dp[i-coin] — นับจำนวน subsets ที่รวมได้ i เริ่มต้น dp[0]=1 (1 way to make 0)'},
+  {id:30,t:'coin',d:'hard',src:'LeetCode #416 — Partition Equal Subset',
+   q:'Partition Equal Subset Sum: แบ่ง array เป็น 2 ส่วนที่ sum เท่ากัน — map กับ Knapsack อย่างไร?',
+   opts:['A) เหมือน Fractional Knapsack','B) เหมือน 0/1 Knapsack: หาว่าเลือก subset ที่ sum = total/2 ได้ไหม','C) ใช้ Greedy เรียงจากมากไปน้อย','D) ใช้ BFS'],
+   a:1,e:'ถ้า total sum เป็นคี่ → impossible ถ้าเป็นคู่ → หา subset ที่ sum = total/2 ซึ่งเป็น 0/1 Knapsack ที่ value = weight แต่ละ item dp[j] = dp[j] OR dp[j-nums[i]]'},
+  {id:31,t:'coin',d:'medium',src:'LeetCode #1049 — Last Stone Weight II',
+   q:'Last Stone Weight II: ลด problem นี้ให้เป็น Knapsack ได้อย่างไร?',
+   opts:['A) Greedy: ชนก้อนที่หนักสุดก่อน','B) หา subset sum ที่ใกล้ total/2 มากสุด — เหมือน Partition Subset','C) BFS ทุก state','D) ใช้ Priority Queue'],
+   a:1,e:'แบ่ง stones เป็น 2 กลุ่ม ผลต่างน้อยสุด = 2*subset - total ที่ minimize ↔ หา max subset ≤ total/2 เหมือน 0/1 Knapsack'},
+  {id:32,t:'coin',d:'hard',src:'Multiple Knapsack',
+   q:'Multiple Knapsack: item แต่ละชิ้นมีจำนวนจำกัด k[i] ชิ้น วิธี efficient คือ?',
+   opts:['A) ทำซ้ำ item i ทั้งหมด k[i] ครั้ง → 0/1 Knapsack','B) Binary representation: แบ่ง k[i] เป็น 1,2,4,...,rem → ลด O(k) เป็น O(log k)','C) Unbounded Knapsack เสมอ','D) ใช้ BFS'],
+   a:1,e:'Binary grouping: k=7 → groups 1,2,4 ทำให้ represent ทุกค่าใน [0,7] ลด O(Σk) เป็น O(Σlog k) สำหรับ items จำกัดจำนวน'},
+
+  {id:33,t:'bigo',d:'easy',src:'Big-O Basics',
+   q:'f(n)=5n²+3n+100 มี Big-O complexity เท่าไหร่?',
+   opts:['A) O(5n²)','B) O(n²)','C) O(n²+n)','D) O(n³)'],
+   a:1,e:'Big-O เอา constant coefficients ออก (5n²→n²) และเก็บเฉพาะ dominant term เมื่อ n→∞ ดังนั้น O(n²)'},
+  {id:34,t:'bigo',d:'medium',src:'Master Theorem',
+   q:'T(n)=2T(n/2)+n ได้ผลลัพธ์ O(?) จาก Master Theorem?',
+   code:'a=2, b=2, f(n)=n\nlog_b(a)=log_2(2)=1',
+   opts:['A) O(n)','B) O(n log n)','C) O(n²)','D) O(log n)'],
+   a:1,e:'f(n)=n = Θ(n^log_b(a)) = Θ(n¹) → Case 2 → T(n)=Θ(n log n) คือ complexity ของ Merge Sort'},
+  {id:35,t:'bigo',d:'medium',src:'Master Theorem Case 3',
+   q:'T(n)=3T(n/4)+n² Master Theorem ให้ผลลัพธ์ O(?)?',
+   code:'a=3, b=4, f(n)=n²\nlog_4(3)≈0.79',
+   opts:['A) O(n^0.79)','B) O(n² log n)','C) O(n²)','D) O(n³)'],
+   a:2,e:'f(n)=n² = Ω(n^(log_4(3)+ε)) → Case 3 ต้องตรวจ regularity condition: 3f(n/4)=3(n/4)²=3n²/16 ≤ cn² ✓ → T(n)=Θ(n²)'},
+  {id:36,t:'bigo',d:'hard',src:'Amortized Analysis',
+   q:'Dynamic Array append() มี amortized O(1) ทั้งที่บางครั้งต้อง resize O(n) เพราะ?',
+   opts:['A) Resize เกิดน้อยมากจนไม่สำคัญ','B) n appends มี total cost O(n): copy 1+2+4+...+n = O(n) → amortized O(1) ต่อ op','C) Memory allocation เป็น O(1)','D) Compiler optimize ให้'],
+   a:1,e:'Geometric doubling: resize เมื่อ fill up เต็มเป็น 1, 2, 4, 8, ... copy costs: 1+2+4+...+n ≤ 2n ดังนั้น n appends มี total O(n) → amortized O(1) ต่อ append'},
+  {id:37,t:'bigo',d:'medium',src:'Triple Loop Complexity',
+   q:'โค้ดนี้มี time complexity เท่าไหร่?',
+   code:'for i in range(n):\n  for j in range(i, n):\n    for k in range(j, n):\n      pass',
+   opts:['A) O(n²)','B) O(n³)','C) O(n³/6) = O(n³)','D) O(n² log n)'],
+   a:2,e:'จำนวน iterations = C(n,3) = n(n-1)(n-2)/6 = Θ(n³) constant factor 1/6 หายไปใน Big-O'},
+  {id:38,t:'bigo',d:'medium',src:'Recurrence — Linear',
+   q:'T(n)=T(n-1)+O(1) มี time complexity เท่าไหร่?',
+   opts:['A) O(log n)','B) O(n)','C) O(n²)','D) O(2ⁿ)'],
+   a:1,e:'Unroll: T(n)=T(n-1)+1=T(n-2)+2=...=T(0)+n = O(n) linear recursion = O(n)'},
+  {id:39,t:'bigo',d:'hard',src:'Space Complexity',
+   q:'Recursive DFS บน tree สูง h มี space complexity อะไรเนื่องจาก call stack?',
+   opts:['A) O(1)','B) O(log n) ถ้า balanced tree','C) O(h) — ขึ้นกับ height ไม่ใช่ n nodes','D) O(n) เสมอ'],
+   a:2,e:'Call stack ลึกเท่ากับ height h ของ tree Balanced tree: h=O(log n) → O(log n) Skewed tree: h=O(n) → O(n) ดังนั้น space = O(h) ที่ขึ้นกับ tree structure'},
+  {id:40,t:'bigo',d:'hard',src:'Big-O vs Big-Θ vs Big-Ω',
+   q:'n² = O(n³) ถูกหรือผิด? และ n² = Θ(n³) ถูกหรือผิด?',
+   opts:['A) ทั้งสองถูก','B) O(n³) ถูก, Θ(n³) ผิด','C) O(n³) ผิด, Θ(n³) ถูก','D) ทั้งสองผิด'],
+   a:1,e:'Big-O เป็น upper bound: n² ≤ c·n³ สำหรับ c=1 และ n≥1 → n²=O(n³) ถูก Big-Θ ต้องการทั้ง upper และ lower bound: n² ≠ Ω(n³) ดังนั้น n²≠Θ(n³) ผิด'},
+  {id:41,t:'bigo',d:'medium',src:'Hash Table Analysis',
+   q:'Hash Table มี average O(1) lookup แต่ worst case คือ O(?) และเกิดขึ้นเมื่อ?',
+   opts:['A) O(log n) เมื่อ hash function ไม่ดี','B) O(n) เมื่อ hash collisions ทุก key ลงใน bucket เดียวกัน','C) O(n log n) เสมอ','D) O(1) เสมอ'],
+   a:1,e:'Worst case: hash function แย่มาก ทุก key collide → linked list ยาว n → lookup O(n) ป้องกันด้วย good hash function, load factor ต่ำ, open addressing'},
+
+  {id:42,t:'graph',d:'easy',src:'BFS vs DFS Data Structure',
+   q:'BFS ใช้ Queue, DFS ใช้ Stack ความแตกต่างในการ traverse คือ?',
+   opts:['A) BFS ไปลึกก่อน, DFS ไปกว้างก่อน','B) BFS กว้างก่อน (ทีละชั้น), DFS ลึกก่อน','C) ไม่มีความแตกต่าง','D) BFS ใช้ Stack, DFS ใช้ Queue'],
+   a:1,e:'BFS (Queue FIFO): เยี่ยม nodes ทีละ level หาได้ shortest path ใน unweighted graph DFS (Stack/Recursion): ไปให้สุดสาย ใช้หา cycles, topological sort, connected components'},
+  {id:43,t:'graph',d:'medium',src:'LeetCode #200 — Islands',
+   q:'Number of Islands: grid ด้านล่างมีกี่ island?',
+   code:'["1","1","0","0","0"]\n["1","1","0","0","0"]\n["0","0","1","0","0"]\n["0","0","0","1","1"]',
+   opts:['A) 2','B) 3','C) 4','D) 5'],
+   a:1,e:'Island 1: top-left 2×2 Island 2: center (row2,col2) Island 3: bottom-right (row3,col3-4) รวม 3 islands DFS/BFS จาก land ที่ไม่เคย visit แล้ว mark visited'},
+  {id:44,t:'graph',d:'medium',src:'Dijkstra Condition',
+   q:'Dijkstra Algorithm ต้องการ edge weights เป็น?',
+   opts:['A) ต้องเป็น integers','B) ต้อง non-negative (≥0)','C) ต้อง positive (>0)','D) ไม่มีข้อจำกัด'],
+   a:1,e:'Dijkstra ใช้ greedy: node ที่ distance น้อยสุดจะไม่ถูก relax อีก property นี้ใช้ไม่ได้ถ้ามี negative edge → ต้องใช้ Bellman-Ford O(VE) แทน'},
+  {id:45,t:'graph',d:'hard',src:'Bellman-Ford',
+   q:'Bellman-Ford Algorithm: ทำไม relax edges V-1 ครั้ง?',
+   opts:['A) เพราะมี V-1 vertices','B) Shortest path ที่ไม่มี cycle มี edges ≤ V-1 การ relax V-1 รอบรับรองว่า propagate ครบ','C) เพราะ E = V-1 ใน tree','D) เป็นค่าตามใจชอบ'],
+   a:1,e:'Shortest simple path ผ่าน ≤ V-1 edges การ relax ครั้งที่ k รับรอง shortest path ที่ใช้ ≤ k edges ถูกต้อง หลัง V-1 rounds ทุก shortest path ถูก compute แล้ว'},
+  {id:46,t:'graph',d:'medium',src:'Topological Sort',
+   q:'Topological Sort ใช้กับ graph ประเภทใด?',
+   opts:['A) Undirected graph','B) DAG (Directed Acyclic Graph)','C) Weighted graph','D) Complete graph'],
+   a:1,e:'Topological Sort ต้องการ DAG: ถ้ามี cycle จะไม่สามารถหา topological order ได้ ใช้ DFS-based (reverse postorder) หรือ Kahn\'s (BFS + in-degree)'},
+  {id:47,t:'graph',d:'medium',src:'LeetCode #207 — Cycle Detection',
+   q:'ตรวจ cycle ใน directed graph ด้วย DFS 3-color คือ?',
+   opts:['A) พบ visited node → มี cycle','B) พบ GRAY node (อยู่ใน current path) → มี back edge → มี cycle','C) พบ BLACK node → มี cycle','D) ใช้ BFS เท่านั้น'],
+   a:1,e:'3-color DFS: WHITE=ยังไม่เยี่ยม GRAY=อยู่ใน call stack BLACK=เสร็จแล้ว พบ GRAY = back edge = cycle! พบ BLACK = cross/forward edge (ไม่ใช่ cycle)'},
+  {id:48,t:'graph',d:'hard',src:'Union-Find / DSU',
+   q:'Union-Find ด้วย path compression + union by rank มี amortized complexity อะไรต่อ operation?',
+   opts:['A) O(log n)','B) O(α(n)) ≈ O(1) — inverse Ackermann function','C) O(n)','D) O(log log n)'],
+   a:1,e:'Path compression: flatten tree ขณะ find Union by rank: attach shorter tree under taller รวมกัน amortized O(α(n)) ที่ α(n) ≤ 4 สำหรับ n ≤ 10^600 ∴ ≈ O(1) ในทางปฏิบัติ'},
+  {id:49,t:'graph',d:'hard',src:"Kruskal's MST",
+   q:"Kruskal's Algorithm สร้าง MST อย่างไร?",
+   opts:['A) เริ่มจาก node แล้วเพิ่ม edge ที่ใกล้สุด (Prim-like)','B) Sort edges by weight, เพิ่ม edge ที่ไม่สร้าง cycle (ใช้ Union-Find ตรวจ)','C) BFS แล้ว track visited edges','D) DFS และ backtrack'],
+   a:1,e:"Kruskal: Sort edges O(E log E) → ทีละ edge เพิ่มเข้า MST ถ้าไม่ทำให้เกิด cycle ตรวจด้วย Union-Find O(α(E)) รวม O(E log E) เหมาะกับ sparse graph"},
+  {id:50,t:'graph',d:'hard',src:'LeetCode #785 — Bipartite Graph',
+   q:'ตรวจว่า graph เป็น Bipartite หรือไม่ ใช้ algorithm ใด?',
+   opts:['A) Dijkstra','B) BFS/DFS ลอง 2-color (BFS ระบายสีสลับ หากชน = ไม่ bipartite)','C) Topological Sort','D) Floyd-Warshall'],
+   a:1,e:'Bipartite = 2-colorable: BFS ระบาย node ด้วย 2 สี สลับกันระหว่าง neighbors ถ้าพบ node ที่ neighbor มีสีเดียวกัน → ไม่ใช่ bipartite มี odd cycle Bipartite ≡ no odd cycle'},
+];
+
+let curTopic='all';
+const ans={};
+const userAns={};
+
+function getQ(){return curTopic==='all'?Q:Q.filter(q=>q.t===curTopic);}
+function topicOf(t){const m={search:'Searching',sort:'Sorting',dp:'Greedy/DP',graph:'Graph',bigo:'Big-O',coin:'Coin/Knapsack'};return m[t]||t;}
+function badgeOf(t){const m={search:'bs',sort:'bso',dp:'bdp',graph:'bgr',bigo:'bbo',coin:'bco'};return m[t]||'bs';}
+function diffOf(d){return{easy:'de',medium:'dm',hard:'dh'}[d]||'de';}
+
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=TOPICS.map(t=>`<button class="tab${curTopic===t.id?' active':''}" onclick="setT('${t.id}')">${t.label}</button>`).join('');
+}
+function setT(id){curTopic=id;renderTabs();renderAll();}
+
+function updateStats(){
+  const qs=getQ();
+  const done=qs.filter(q=>ans[q.id]!==undefined).length;
+  const ok=qs.filter(q=>ans[q.id]===true).length;
+  const no=qs.filter(q=>ans[q.id]===false).length;
+  document.getElementById('sT').textContent=qs.length;
+  document.getElementById('sC').textContent=ok;
+  document.getElementById('sW').textContent=no;
+  document.getElementById('sP').textContent=done?Math.round(ok/done*100)+'%':'—';
+  document.getElementById('pf').style.width=qs.length?Math.round(done/qs.length*100)+'%':'0%';
+}
+
+function renderAll(){
+  updateStats();
+  const qs=getQ();
+  document.getElementById('qa').innerHTML=qs.map((q,i)=>renderQ(q,i)).join('');
+}
+
+function renderQ(q,i){
+  const done=ans[q.id]!==undefined;
+  const ua=userAns[q.id];
+  const opts=q.opts.map((o,j)=>{
+    let cls='opt';
+    if(done){
+      cls+=' dis';
+      if(j===q.a)cls+=' ok';
+      else if(j===ua&&ua!==q.a)cls+=' no';
+    }
+    const oc=done?'':`onclick="pick(${q.id},${j})"`;
+    return`<button class="${cls}" ${oc}>${o}</button>`;
+  }).join('');
+  const expl=done?`<div class="expl"><strong>คำอธิบาย:</strong> ${q.e}</div>`:'';
+  const act=!done?`<div class="acts"><button class="btn btn-p" onclick="askAI(${q.id})">ถาม AI อธิบาย ↗</button></div>`:'';
+  return`<div class="qcard" id="qc-${q.id}">
+    <div class="qmeta">
+      <span class="badge ${badgeOf(q.t)}">${topicOf(q.t)}</span>
+      <span class="qnum">#${i+1} · ${q.src}</span>
+      <span class="qdiff ${diffOf(q.d)}">${q.d}</span>
+    </div>
+    <div class="qtext">${q.q}</div>
+    ${q.code?`<div class="qcode">${q.code}</div>`:''}
+    <div class="opts">${opts}</div>
+    ${expl}${act}
+  </div>`;
+}
+
+function pick(qid,optIdx){
+  if(ans[qid]!==undefined)return;
+  const q=Q.find(x=>x.id===qid);
+  userAns[qid]=optIdx;
+  ans[qid]=optIdx===q.a;
+  renderAll();
+  const el=document.getElementById('qc-'+qid);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function askAI(qid){
+  const q=Q.find(x=>x.id===qid);
+  if(!q)return;
+  sendPrompt(`อธิบายข้อ "${q.src}" ให้ละเอียดขึ้น พร้อมตัวอย่างโค้ดหรือ trace ถ้าทำได้`);
+}
+
+renderTabs();
+renderAll();
+</script>
